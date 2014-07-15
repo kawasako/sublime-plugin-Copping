@@ -1,9 +1,13 @@
 import sublime, sublime_plugin, os, re
 
+globals()['coppimg_status'] = {}
+coppimg_status['index'] = 0
+coppimg_status['search_dir'] = False
+coppimg_status['relative_assets'] = False
+coppimg_status['root_path'] = False
 
-# class ExampleEventListener(sublime_plugin.EventListener):
-#   def on_activated_async(self, view):
-#     sublime.error_message("hogeeeeeeeeee")
+globals()['coppimg_settings'] = sublime.load_settings('Copping.sublime-settings')
+print(coppimg_settings.get('nandemo'))
 
 class PutCommand(sublime_plugin.TextCommand):
   def run(self, edit, txt):
@@ -14,9 +18,10 @@ class PutCommand(sublime_plugin.TextCommand):
 class ExampleCommand(sublime_plugin.WindowCommand):
   def run(self):
 
+    close_message = '[×] Close this window'
     folders = self.window.folders()
-    files = []
-    reg = re.compile(r".*\.png|\.gif|\.jpg$")
+    files = [close_message]
+    reg = re.compile(r'.*\.png|\.gif|\.jpg$')
 
     def fild_all_files(directory):
       for root, dirs, files in os.walk(directory):
@@ -25,19 +30,31 @@ class ExampleCommand(sublime_plugin.WindowCommand):
           yield os.path.join(root, file).replace(directory, "")
 
     def append_img_tag(index):
-      img_data = self.getImageInfo(folders[0]+files[index])
-      img_tag = '<img src="{src}" width="{width}" height="{height}" alt="">'
-      img_tag = img_tag.replace('{src}', files[index]).replace('{width}', str(img_data[1])).replace('{height}', str(img_data[2]))
-      self.window.active_view().run_command('put', { "txt": img_tag })
-      # self.window.active_view().insert(edit, 0, img_data.width)
-      print(img_data)
+      coppimg_status['index'] = index
+
+      if not files[index] == close_message:
+        file_path = files[index]
+        if coppimg_status['relative_assets']:
+          reg2 = re.compile(r'^.*\/')
+          base_dir = reg2.match(self.window.active_view().file_name()).group(0)
+          file_path = folders[0]+files[index]
+          file_path = os.path.relpath(file_path, base_dir)
+
+        syntax = self.window.active_view().settings().get('syntax')
+        print(syntax)
+
+        img_data = self.getImageInfo(folders[0]+files[index])
+        img_tag = '<img src="{src}" width="{width}" height="{height}" alt="">'
+        img_tag = img_tag.replace('{src}', file_path).replace('{width}', str(img_data[1])).replace('{height}', str(img_data[2]))
+
+        self.window.active_view().run_command('put', { "txt": img_tag })
 
     for file in fild_all_files(folders[0]):
       match_obj = reg.search(file)
       if match_obj:
         files.append(file)
 
-    self.window.show_quick_panel(files, append_img_tag)
+    self.window.show_quick_panel(files, append_img_tag, 0, coppimg_status['index'])
 
   # http://stackoverflow.com/questions/8032642/how-to-obtain-image-size-using-standard-python-class-without-using-external-lib
   def getImageInfo(self, fname):
