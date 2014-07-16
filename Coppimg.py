@@ -3,11 +3,8 @@ import sublime, sublime_plugin, os, re
 globals()['coppimg_status'] = {}
 coppimg_status['index'] = 0
 coppimg_status['search_dir'] = False
-coppimg_status['relative_assets'] = False
-coppimg_status['root_path'] = False
 
 globals()['coppimg_settings'] = sublime.load_settings('Copping.sublime-settings')
-print(coppimg_settings.get('nandemo'))
 
 class PutCommand(sublime_plugin.TextCommand):
   def run(self, edit, txt):
@@ -34,13 +31,15 @@ class ExampleCommand(sublime_plugin.WindowCommand):
 
       if not files[index] == close_message:
         file_path = files[index]
-        if coppimg_status['relative_assets']:
-          reg2 = re.compile(r'^.*\/')
-          base_dir = reg2.match(self.window.active_view().file_name()).group(0)
+        if coppimg_settings.get('relative_assets'):
+          dir_reg = re.compile(r'^.*\/')
+          base_dir = dir_reg.match(self.window.active_view().file_name()).group(0)
           file_path = folders[0]+files[index]
           file_path = os.path.relpath(file_path, base_dir)
 
+        syntax_reg = re.compile('^.*?/(.*)\.tmLanguage')
         syntax = self.window.active_view().settings().get('syntax')
+        syntax = syntax_reg.sub(syntax, 'First')
         print(syntax)
 
         img_data = self.getImageInfo(folders[0]+files[index])
