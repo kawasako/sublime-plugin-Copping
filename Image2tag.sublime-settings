@@ -1,0 +1,20 @@
+{
+  // # Using relative path
+  // "relative_assets": true,
+  "relative_assets": false,
+
+  // # Change root path
+  // "root_path": "/app/assets",
+  "root_path": false,
+
+  // # Syntax
+  // [Syntax_name]_tag: [Tag] -> Set new syntax
+  // {src} -> Convert image_path
+  // {width} -> Convert image_width
+  // {height} -> Convert image_height
+  "Default_tag": "<img src=\"{src}\" width=\"{width}\" height=\"{height}\" alt=\"\">",
+
+  // # Syntax examples
+  // "HTML (Rails)_tag": "<%= image_tag '{src}', size: '{width}x{height}', alt: '' %>",
+  // "Slim_tag": "= image_tag '{src}' ,size: '{width}x{height}'"
+}
