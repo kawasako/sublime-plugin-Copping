@@ -2,10 +2,6 @@
 Insert img-tag of selected image-files. 
 Supporting OSX and Sublime Text 3 only.
 
-## Installation（OSX）
-	cd ~/Library/Application\ Support/Sublime\ Text\ 3/Packages
-	git clone git@github.com:kawasako/sublime-plugin-Image2tag.git Image2tag
-
 ## How to use
 1. Please open your sublime-project.
 2. Ctrl+C（Default key bind）
